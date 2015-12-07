@@ -14,11 +14,6 @@
 
 #define MALI_INVALID_MEM_ADDR 0xFFFFFFFF
 
-extern unsigned long fb0_start;
-extern unsigned long fb0_size;
-extern unsigned long fb1_start;
-extern unsigned long fb1_size;
-
 typedef struct
 {
 	u32 phys_base;        /**< Mali physical base of the memory, page aligned */
@@ -76,14 +71,6 @@ static _mali_osk_errcode_t validation_check_helper(u32 phys_addr, u32 size,
 
 _mali_osk_errcode_t mali_mem_validation_check(u32 phys_addr, u32 size)
 {
-	_mali_mem_validation_t fb0 = { fb0_start, fb0_size };
-	_mali_mem_validation_t fb1 = { fb1_start, fb1_size };
-
-	if (validation_check_helper(phys_addr, size, fb0) == _MALI_OSK_ERR_OK ||
-	    validation_check_helper(phys_addr, size, fb1) == _MALI_OSK_ERR_OK ||
-	    validation_check_helper(phys_addr, size, mali_mem_validator) == _MALI_OSK_ERR_OK)
-		return _MALI_OSK_ERR_OK;
-
-	MALI_PRINT_ERROR(("MALI PHYSICAL RANGE VALIDATION ERROR: The range supplied was: phys_base=0x%08X, size=0x%08X\n", phys_addr, size));
-	return _MALI_OSK_ERR_FAULT;
+	/* Accept any memory region without validation */
+	return _MALI_OSK_ERR_OK;
 }

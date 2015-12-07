@@ -17,105 +17,69 @@
 #include "mali_platform.h"
 #include "mali_mem_validation.h"
 
-#include <linux/module.h>
+#include <linux/mali/mali_utgard.h>
+#include <linux/platform_device.h>
+#include <linux/version.h>
+#include <linux/regulator/consumer.h>
 #include <linux/clk.h>
+#include <linux/clk/sunxi_name.h>
+#include <linux/clk-private.h>
+#include <linux/pm_runtime.h>
+#include <linux/dma-mapping.h>
+#include <linux/stat.h>
+#include <linux/delay.h>
 #include <mach/irqs.h>
-#include <mach/clock.h>
-#include <plat/sys_config.h>
-#include <plat/memory.h>
+#include <mach/sys_config.h>
+#include <mach/platform.h>
 
-int mali_clk_div = 3;
-module_param(mali_clk_div, int, S_IRUSR | S_IWUSR | S_IWGRP | S_IRGRP | S_IROTH);
-MODULE_PARM_DESC(mali_clk_div, "Clock divisor for mali");
-
-struct clk *h_ahb_mali, *h_mali_clk, *h_ve_pll;
-int mali_clk_flag=0;
-
+static struct clk *mali_clk = NULL;
+static struct clk *gpu_pll  = NULL;
 
 _mali_osk_errcode_t mali_platform_init(void)
 {
-	unsigned long rate;
-	int clk_div;
-	int mali_used = 0;
+	int freq = 252; /* 252 MHz */
 
-	//get mali ahb clock
-	h_ahb_mali = clk_get(NULL, "ahb_mali");
-	if(!h_ahb_mali){
-		MALI_PRINT(("try to get ahb mali clock failed!\n"));
-	}
-	//get mali clk
-	h_mali_clk = clk_get(NULL, "mali");
-	if(!h_mali_clk){
-		MALI_PRINT(("try to get mali clock failed!\n"));
+	gpu_pll = clk_get(NULL, PLL_GPU_CLK);
+
+	if (!gpu_pll || IS_ERR(gpu_pll))	{
+		printk(KERN_ERR "Failed to get gpu pll clock!\n");
+		return -1;
 	}
 
-	h_ve_pll = clk_get(NULL, "ve_pll");
-	if(!h_ve_pll){
-		MALI_PRINT(("try to get ve pll clock failed!\n"));
+	mali_clk = clk_get(NULL, GPU_CLK);
+	if (!mali_clk || IS_ERR(mali_clk)) {
+		printk(KERN_ERR "Failed to get mali clock!\n");
+		return -1;
 	}
 
-	//set mali parent clock
-	if(clk_set_parent(h_mali_clk, h_ve_pll)){
-		MALI_PRINT(("try to set mali clock source failed!\n"));
+	if (clk_set_rate(gpu_pll, freq * 1000 * 1000)) {
+		printk(KERN_ERR "Failed to set gpu pll clock!\n");
+		return -1;
 	}
 
-	//set mali clock
-	rate = clk_get_rate(h_ve_pll);
+	if (clk_set_rate(mali_clk, freq * 1000 * 1000)) {
+		printk(KERN_ERR "Failed to set mali clock!\n");
+		return -1;
+	}
+	
+	if (mali_clk->enable_count == 0) {
+		if (clk_prepare_enable(gpu_pll))
+			printk(KERN_ERR "Failed to enable gpu pll!\n");
 
-	if(!script_parser_fetch("mali_para", "mali_used", &mali_used, 1)) {
-		if (mali_used == 1) {
-			if (!script_parser_fetch("mali_para", "mali_clkdiv", &clk_div, 1)) {
-				if (clk_div > 0) {
-					pr_info("mali: use config clk_div %d\n", clk_div);
-					mali_clk_div = clk_div;
-				}
-			}
-		}
+		if (clk_prepare_enable(mali_clk))
+			printk(KERN_ERR "Failed to enable mali clock!\n");
 	}
 
-	pr_info("mali: clk_div %d\n", mali_clk_div);
-	rate /= mali_clk_div;
-
-	if(clk_set_rate(h_mali_clk, rate)){
-		MALI_PRINT(("try to set mali clock failed!\n"));
-	}
-
-	if(clk_reset(h_mali_clk,0)){
-		MALI_PRINT(("try to reset release failed!\n"));
-	}
-
-	MALI_PRINT(("mali clock set completed, clock is  %d Hz\n", rate));
-
-
-	/*enable mali axi/apb clock*/
-	if(mali_clk_flag == 0)
-	{
-		//printk(KERN_WARNING "enable mali clock\n");
-		//MALI_PRINT(("enable mali clock\n"));
-		mali_clk_flag = 1;
-	       if(clk_enable(h_ahb_mali))
-	       {
-		     MALI_PRINT(("try to enable mali ahb failed!\n"));
-	       }
-	       if(clk_enable(h_mali_clk))
-	       {
-		       MALI_PRINT(("try to enable mali clock failed!\n"));
-	        }
-	}
-
+	pr_info("mali clk: %d MHz\n", freq);
 
     MALI_SUCCESS;
 }
 
 _mali_osk_errcode_t mali_platform_deinit(void)
 {
-	/*close mali axi/apb clock*/
-	if(mali_clk_flag == 1)
-	{
-		//MALI_PRINT(("disable mali clock\n"));
-		mali_clk_flag = 0;
-	       clk_disable(h_mali_clk);
-	       clk_disable(h_ahb_mali);
+	if (mali_clk->enable_count == 1) {
+		clk_disable_unprepare(mali_clk);
+		clk_disable_unprepare(gpu_pll);
 	}
 
     MALI_SUCCESS;

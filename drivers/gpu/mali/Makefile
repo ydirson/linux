@@ -1,6 +1,6 @@
 # Configuration for A10
 
-ifdef CONFIG_ARCH_SUN7I
+ifdef CONFIG_ARCH_SUN8IW7P1
 CONFIG:=ca7-virtex820-m400-2
 MALI_PLATFORM_FILE:=platform/${CONFIG}/mali_platform.c
 export MALI_PLATFORM_FILE

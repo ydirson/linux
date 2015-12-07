@@ -17,13 +17,13 @@
  hardcode the irq to make it work on allwinner a20 platform
 */
 #define SW_INT_START 32
-#define SW_INT_IRQNO_GPU_GP             (69 + SW_INT_START)
-#define SW_INT_IRQNO_GPU_GPMMU          (70 + SW_INT_START)
-#define SW_INT_IRQNO_GPU_PP0            (71 + SW_INT_START)
-#define SW_INT_IRQNO_GPU_PPMMU0         (72 + SW_INT_START)
-#define SW_INT_IRQNO_GPU_PMU            (73 + SW_INT_START)
-#define SW_INT_IRQNO_GPU_PP1            (74 + SW_INT_START)
-#define SW_INT_IRQNO_GPU_PPMMU1         (75 + SW_INT_START)
+#define SW_INT_IRQNO_GPU_GP             (97 + SW_INT_START)
+#define SW_INT_IRQNO_GPU_GPMMU          (98 + SW_INT_START)
+#define SW_INT_IRQNO_GPU_PP0            (99 + SW_INT_START)
+#define SW_INT_IRQNO_GPU_PPMMU0         (100 + SW_INT_START)
+#define SW_INT_IRQNO_GPU_PMU            (101 + SW_INT_START)
+#define SW_INT_IRQNO_GPU_PP1            (102 + SW_INT_START)
+#define SW_INT_IRQNO_GPU_PPMMU1         (103 + SW_INT_START)
 
 static _mali_osk_resource_t arch_configuration [] =
 {
