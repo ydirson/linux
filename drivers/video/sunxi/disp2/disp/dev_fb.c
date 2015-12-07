@@ -524,6 +524,8 @@ static int fb_wait_for_vsync(struct fb_info *info)
 	return 0;
 }
 
+static int wait_for_vsync_flag;
+
 static int sunxi_fb_pan_display(struct fb_var_screeninfo *var,struct fb_info *info)
 {
 	u32 sel = 0;
@@ -562,7 +564,10 @@ static int sunxi_fb_pan_display(struct fb_var_screeninfo *var,struct fb_info *in
 		}
 	}
 
-	fb_wait_for_vsync(info);
+	if (wait_for_vsync_flag) {
+		wait_for_vsync_flag = 0;
+		fb_wait_for_vsync(info);
+	}
 
 	return 0;
 }
@@ -874,7 +879,7 @@ static int sunxi_fb_ioctl(struct fb_info *info, unsigned int cmd,unsigned long a
 
 	case FBIO_WAITFORVSYNC:
 	{
-		//ret = fb_wait_for_vsync(info);
+		wait_for_vsync_flag = 1;
 		break;
 	}
 
