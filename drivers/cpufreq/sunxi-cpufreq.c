@@ -87,6 +87,7 @@ struct cpufreq_frequency_table sunxi_freq_tbl[] = {
 	{ .frequency = 1008000, .index = SUNXI_CLK_DIV(0, 0, 0, 0), },
 	{ .frequency = 1104000, .index = SUNXI_CLK_DIV(0, 0, 0, 0), },
 	{ .frequency = 1200000, .index = SUNXI_CLK_DIV(0, 0, 0, 0), },
+	{ .frequency = 1296000, .index = SUNXI_CLK_DIV(0, 0, 0, 0), },
 	{ .frequency = 1344000, .index = SUNXI_CLK_DIV(0, 0, 0, 0), },
 	{ .frequency = 1440000, .index = SUNXI_CLK_DIV(0, 0, 0, 0), },
 	{ .frequency = 1536000, .index = SUNXI_CLK_DIV(0, 0, 0, 0), },
