@@ -53,6 +53,10 @@
 #include <asm/msr.h>
 #include <asm/reboot.h>
 
+#ifdef CONFIG_XEN_MCE_LOG
+#include <xen/xen.h>
+#endif
+
 #include "internal.h"
 
 /* sysfs synchronization */
@@ -2725,6 +2729,11 @@ err_out_mem:
 	free_cpumask_var(mce_device_initialized);
 
 err_out:
+#ifdef CONFIG_XEN_MCE_LOG
+	/* in case of Xen, the character device was already registered, so do not
+	 * treat this as an error */
+	if (!xen_initial_domain() || err != -EBUSY)
+#endif
 	pr_err("Unable to init MCE device (rc: %d)\n", err);
 
 	return err;
