@@ -29,8 +29,10 @@ typedef struct
 	u32                     pseudo_palette [FB_MAX][16];
 	wait_queue_head_t       wait[3];
 	unsigned long           wait_count[3];
+#if 0
 	struct task_struct      *vsync_task[3];
 	ktime_t                 vsync_timestamp[3];
+#endif
 
 	int                     blank[3];
 }fb_info_t;
@@ -692,10 +694,12 @@ static int sunxi_fb_cursor(struct fb_info *info, struct fb_cursor *cursor)
 
 s32 drv_disp_vsync_event(u32 sel)
 {
+#if 0
 	g_fbi.vsync_timestamp[sel] = ktime_get();
 
 	if(g_fbi.vsync_task[sel])
 		wake_up_process(g_fbi.vsync_task[sel]);
+#endif
 
 	return 0;
 }
@@ -735,6 +739,7 @@ static void send_vsync_work_2(struct work_struct *work)
 }
 #endif
 
+#if 0
 static int vsync_proc(u32 disp)
 {
 	char buf[64];
@@ -763,6 +768,7 @@ static int vsync_thread(void *parg)
 
 	return 0;
 }
+#endif
 
 void DRV_disp_int_process(u32 sel)
 {
@@ -1297,6 +1303,7 @@ s32 fb_init(struct platform_device *pdev)
 	for(i=0; i<num_screens; i++) {
 		char task_name[25];
 
+#if 0
 		sprintf(task_name, "vsync proc %d", i);
 		g_fbi.vsync_task[i] = kthread_create(vsync_thread, (void*)i, task_name);
 		if(IS_ERR(g_fbi.vsync_task[i])) {
@@ -1307,6 +1314,7 @@ s32 fb_init(struct platform_device *pdev)
 		} else {
 			sched_setscheduler_nocheck(g_fbi.vsync_task[i], SCHED_FIFO, &param);
 		}
+#endif
 	}
 	init_waitqueue_head(&g_fbi.wait[0]);
 	init_waitqueue_head(&g_fbi.wait[1]);
