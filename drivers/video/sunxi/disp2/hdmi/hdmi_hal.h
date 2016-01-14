@@ -25,6 +25,7 @@
 #define HDMI3840_2160P_24   (3+0x100)
 
 #define HDMI_EDID_LEN 1024
+#define HDMI_EDID            511
 
 extern void hdmi_delay_ms(__u32 t);
 extern void hdmi_delay_us(unsigned long us);
