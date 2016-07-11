@@ -380,6 +380,15 @@ static void disk_scan_partitions(struct gendisk *disk)
 		blkdev_put(bdev, FMODE_READ);
 }
 
+/* copied (not moved) from far down below, to have fewer patch hunks */
+#undef MODULE_PARAM_PREFIX
+#define MODULE_PARAM_PREFIX     "block."
+
+/* partition scanning policy */
+static bool disk_no_part_scan = 0;
+module_param_named(no_part_scan, disk_no_part_scan, bool, S_IRUGO|S_IWUSR);
+MODULE_PARM_DESC(no_part_scan, "When adding block devices, always mark them as not to be scanned for partitions");
+
 /**
  * device_add_disk - add disk information to kernel list
  * @parent: parent device for the disk
@@ -403,6 +412,9 @@ int device_add_disk(struct device *parent, struct gendisk *disk,
 	 * registration.
 	 */
 	elevator_init_mq(disk->queue);
+
+	if (disk_no_part_scan)
+		disk->flags |= GENHD_FL_NO_PART_SCAN;
 
 	/*
 	 * If the driver provides an explicit major number it also must provide
