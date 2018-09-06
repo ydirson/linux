@@ -1337,9 +1337,10 @@ static void xennet_release_tx_bufs(struct netfront_queue *queue)
 		skb = queue->tx_skbs[i];
 		queue->tx_skbs[i] = NULL;
 		get_page(queue->grant_tx_page[i]);
-		gnttab_end_foreign_access(queue->grant_tx_ref[i],
-					  GNTMAP_readonly,
-					  (unsigned long)page_address(queue->grant_tx_page[i]));
+		gnttab_end_foreign_access_ref(
+				queue->grant_tx_ref[i], GNTMAP_readonly);
+		gnttab_release_grant_reference(
+				&queue->gref_tx_head, queue->grant_tx_ref[i]);
 		queue->grant_tx_page[i] = NULL;
 		queue->grant_tx_ref[i] = GRANT_INVALID_REF;
 		add_id_to_list(&queue->tx_skb_freelist, queue->tx_link, i);
