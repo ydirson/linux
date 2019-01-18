@@ -1033,6 +1033,10 @@ static int hvc_init(void)
 	drv->minor_start = HVC_MINOR;
 	drv->type = TTY_DRIVER_TYPE_SYSTEM;
 	drv->init_termios = tty_std_termios;
+	/* by default start in RAW mode, so opening device wouldn't throw away
+	 * buffered data */
+	drv->init_termios.c_iflag = 0;
+	drv->init_termios.c_lflag &= ~(ISIG | ICANON);
 	drv->flags = TTY_DRIVER_REAL_RAW | TTY_DRIVER_RESET_TERMIOS;
 	tty_set_operations(drv, &hvc_ops);
 
