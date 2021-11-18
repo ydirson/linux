@@ -31,8 +31,10 @@ int pci_enable_rom(struct pci_dev *pdev)
 		return -1;
 
 	/* Nothing to enable if we're using a shadow copy in RAM */
-	if (res->flags & IORESOURCE_ROM_SHADOW)
+	if (res->flags & IORESOURCE_ROM_SHADOW) {
+		pci_info(pdev, "pci_enable_rom: shadow copy, nothing to do\n");
 		return 0;
+	}
 
 	/*
 	 * Ideally pci_update_resource() would update the ROM BAR address,
@@ -96,6 +98,10 @@ static size_t pci_get_rom_size(struct pci_dev *pdev, void __iomem *rom,
 				 readw(image));
 			break;
 		}
+		pci_info(pdev, "PCI ROM @00: %04x %04x %04x %04x\n",
+			 readw(image), readw(image+2), readw(image+4), readw(image+6));
+		pci_info(pdev, "PCI ROM @16: %04x %04x %04x %04x\n",
+			 readw(image+0x16), readw(image+0x16+2), readw(image+0x16+4), readw(image+0x16+6));
 		/* get the PCI data structure and check its "PCIR" signature */
 		pds = image + readw(image + 24);
 		if (readl(pds) != 0x52494350) {
@@ -139,6 +145,7 @@ void __iomem *pci_map_rom(struct pci_dev *pdev, size_t *size)
 	loff_t start;
 	void __iomem *rom;
 
+	pci_info(pdev, "pci_map_rom()\n");
 	/* assign the ROM an address if it doesn't have one */
 	if (res->parent == NULL && pci_assign_resource(pdev, PCI_ROM_RESOURCE))
 		return NULL;
@@ -148,13 +155,19 @@ void __iomem *pci_map_rom(struct pci_dev *pdev, size_t *size)
 	if (*size == 0)
 		return NULL;
 
+	pci_info(pdev, "pci_map_rom: start=%p, size=%zx\n", start, *size);
+
 	/* Enable ROM space decodes */
-	if (pci_enable_rom(pdev))
+	if (pci_enable_rom(pdev)) {
+		pci_info(pdev, "pci_map_rom: pci_enable_rom failed\n");
 		return NULL;
+	}
 
 	rom = ioremap(start, *size);
-	if (!rom)
+	if (!rom) {
+		pci_info(pdev, "pci_map_rom: ioremap failed\n");
 		goto err_ioremap;
+	}
 
 	/*
 	 * Try to find the true size of the ROM since sometimes the PCI window
@@ -162,8 +175,10 @@ void __iomem *pci_map_rom(struct pci_dev *pdev, size_t *size)
 	 * True size is important if the ROM is going to be copied.
 	 */
 	*size = pci_get_rom_size(pdev, rom, *size);
-	if (!*size)
+	if (!*size) {
+		pci_info(pdev, "pci_map_rom: pci_get_rom_size failed\n");
 		goto invalid_rom;
+	}
 
 	return rom;
 
