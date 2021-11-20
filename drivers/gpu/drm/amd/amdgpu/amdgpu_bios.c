@@ -92,6 +92,7 @@ static bool igp_read_bios_from_vram(struct amdgpu_device *adev)
 	uint8_t __iomem *bios;
 	resource_size_t vram_base;
 	resource_size_t size = 256 * 1024; /* ??? */
+	DRM_INFO("igp_read_bios_from_vram()\n");
 
 	if (!(adev->flags & AMD_IS_APU))
 		if (amdgpu_device_need_post(adev))
@@ -129,6 +130,7 @@ bool amdgpu_read_bios(struct amdgpu_device *adev)
 {
 	uint8_t __iomem *bios;
 	size_t size;
+	DRM_INFO("amdgpu_read_bios()\n");
 
 	adev->bios = NULL;
 	/* XXX: some cards may return 0 for rom size? ddx has a workaround */
@@ -158,20 +160,36 @@ static bool amdgpu_read_bios_from_rom(struct amdgpu_device *adev)
 {
 	u8 header[AMD_VBIOS_SIGNATURE_END+1] = {0};
 	int len;
+	DRM_INFO("amdgpu_read_bios_from_rom()\n");
 
-	if (!adev->asic_funcs || !adev->asic_funcs->read_bios_from_rom)
+	if (!adev->asic_funcs || !adev->asic_funcs->read_bios_from_rom) {
+		DRM_INFO("amdgpu_read_bios_from_rom: no read_bios_from_rom asic func\n");
 		return false;
+	}
 
 	/* validate VBIOS signature */
-	if (amdgpu_asic_read_bios_from_rom(adev, &header[0], sizeof(header)) == false)
+	if (amdgpu_asic_read_bios_from_rom(adev, &header[0], sizeof(header)) == false) {
+		DRM_INFO("amdgpu_read_bios_from_rom: amdgpu_asic_read_bios_from_rom failed\n");
 		return false;
+	}
 	header[AMD_VBIOS_SIGNATURE_END] = 0;
 
-	if ((!AMD_IS_VALID_VBIOS(header)) ||
-	    0 != memcmp((char *)&header[AMD_VBIOS_SIGNATURE_OFFSET],
-			AMD_VBIOS_SIGNATURE,
-			strlen(AMD_VBIOS_SIGNATURE)))
+	if (!AMD_IS_VALID_VBIOS(header)) {
+		DRM_INFO("amdgpu_read_bios_from_rom: bad vbios header: %02x %02x\n",
+			 header[0], header[1]);
 		return false;
+	}
+	if (0 != memcmp((char *)&header[AMD_VBIOS_SIGNATURE_OFFSET],
+			AMD_VBIOS_SIGNATURE,
+			strlen(AMD_VBIOS_SIGNATURE))) {
+		DRM_INFO("amdgpu_read_bios_from_rom: bad amd vbios signature:"
+			 "%08x %08x %08x\n",
+			 ((uint32_t*)&header[AMD_VBIOS_SIGNATURE_OFFSET])[0],
+			 ((uint32_t*)&header[AMD_VBIOS_SIGNATURE_OFFSET])[1],
+			 ((uint32_t*)&header[AMD_VBIOS_SIGNATURE_OFFSET])[2]
+			);
+		return false;
+	}
 
 	/* valid vbios, go on */
 	len = AMD_VBIOS_LENGTH(header);
@@ -199,6 +217,7 @@ static bool amdgpu_read_platform_bios(struct amdgpu_device *adev)
 	phys_addr_t rom = adev->pdev->rom;
 	size_t romlen = adev->pdev->romlen;
 	void __iomem *bios;
+	DRM_INFO("amdgpu_read_platform_bios()\n");
 
 	adev->bios = NULL;
 
@@ -284,6 +303,7 @@ static bool amdgpu_atrm_get_bios(struct amdgpu_device *adev)
 	acpi_handle dhandle, atrm_handle;
 	acpi_status status;
 	bool found = false;
+	DRM_INFO("amdgpu_atrm_get_bios()\n");
 
 	/* ATRM is for the discrete card only */
 	if (adev->flags & AMD_IS_APU)
@@ -349,6 +369,7 @@ static inline bool amdgpu_atrm_get_bios(struct amdgpu_device *adev)
 
 static bool amdgpu_read_disabled_bios(struct amdgpu_device *adev)
 {
+	DRM_INFO("amdgpu_read_disabled_bios()\n");
 	if (adev->flags & AMD_IS_APU)
 		return igp_read_bios_from_vram(adev);
 	else
@@ -363,6 +384,7 @@ static bool amdgpu_acpi_vfct_bios(struct amdgpu_device *adev)
 	acpi_size tbl_size;
 	UEFI_ACPI_VFCT *vfct;
 	unsigned offset;
+	DRM_INFO("amdgpu_acpi_vfct_bios()\n");
 
 	if (!ACPI_SUCCESS(acpi_get_table("VFCT", 1, &hdr)))
 		return false;
