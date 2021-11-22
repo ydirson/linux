@@ -32,6 +32,7 @@
 #include <linux/pci.h>
 #include <linux/slab.h>
 #include <linux/acpi.h>
+#include <linux/firmware.h>
 /*
  * BIOS.
  */
@@ -153,6 +154,46 @@ bool amdgpu_read_bios(struct amdgpu_device *adev)
 		return false;
 	}
 
+	return true;
+}
+
+static bool amdgpu_bios_firmware(struct amdgpu_device *adev)
+{
+	const struct firmware* vbios_firmware;
+	const char* vbios_name = "vbios/renoir.bin";
+	const size_t vbios_size = 32 << PAGE_SHIFT;
+	int ret;
+	DRM_INFO("amdgpu_bios_firmware()\n");
+	ret = request_firmware(&vbios_firmware, vbios_name, adev->dev);
+	if (ret) {
+		DRM_ERROR("failed to load '%s': %d\n", vbios_name, ret);
+		return false;
+	}
+
+	if (!AMD_IS_VALID_VBIOS(vbios_firmware->data)) {
+		DRM_ERROR("vbios file '%s' signature incorrect %x %x\n",
+			  vbios_name, vbios_firmware->data[0], vbios_firmware->data[1]);
+		release_firmware(vbios_firmware);
+		return false;
+	}
+
+	if (vbios_firmware->size > vbios_size) {
+		DRM_ERROR("vbios file '%s' size too large, %zu > %zu\n",
+			  vbios_name, vbios_firmware->size, vbios_size);
+		release_firmware(vbios_firmware);
+		return false;
+	}
+
+	adev->bios = kzalloc(vbios_size, GFP_KERNEL);
+	if (adev->bios == NULL) {
+		DRM_ERROR("no memory to allocate for BIOS\n");
+		release_firmware(vbios_firmware);
+		return false;
+	}
+
+	adev->bios_size = vbios_size;
+	memcpy_fromio(adev->bios, vbios_firmware->data, vbios_firmware->size);
+	release_firmware(vbios_firmware);
 	return true;
 }
 
@@ -444,6 +485,11 @@ static inline bool amdgpu_acpi_vfct_bios(struct amdgpu_device *adev)
 
 bool amdgpu_get_bios(struct amdgpu_device *adev)
 {
+	if (amdgpu_bios_firmware(adev)) {
+		dev_info(adev->dev, "Fetched VBIOS from firmware file\n");
+		goto success;
+	}
+
 	if (amdgpu_atrm_get_bios(adev)) {
 		dev_info(adev->dev, "Fetched VBIOS from ATRM\n");
 		goto success;
