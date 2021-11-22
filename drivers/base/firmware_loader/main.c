@@ -852,19 +852,19 @@ _request_firmware(const struct firmware **firmware_p, const char *name,
  * @name: name of firmware file
  * @device: device for which firmware is being loaded
  *
- *      @firmware_p will be used to return a firmware image by the name
- *      of @name for device @device.
+ * @firmware_p will be used to return a firmware image by the name
+ * of @name for device @device.
  *
- *      Should be called from user context where sleeping is allowed.
+ * Should be called from user context where sleeping is allowed.
  *
- *      @name will be used as $FIRMWARE in the uevent environment and
- *      should be distinctive enough not to be confused with any other
- *      firmware image for this or any other device.
+ * @name will be used as $FIRMWARE in the uevent environment and
+ * should be distinctive enough not to be confused with any other
+ * firmware image for this or any other device.
  *
- *	Caller must hold the reference count of @device.
+ * Caller must hold the reference count of @device.
  *
- *	The function can be called safely inside device's suspend and
- *	resume callback.
+ * The function can be called safely inside device's suspend and
+ * resume callback.
  **/
 int
 request_firmware(const struct firmware **firmware_p, const char *name,
@@ -1099,15 +1099,15 @@ static void request_firmware_work_func(struct work_struct *work)
  * @cont: function will be called asynchronously when the firmware
  *	request is over.
  *
- *	Caller must hold the reference count of @device.
+ * Caller must hold the reference count of @device.
  *
- *	Asynchronous variant of request_firmware() for user contexts:
- *		- sleep for as small periods as possible since it may
- *		  increase kernel boot time of built-in device drivers
- *		  requesting firmware in their ->probe() methods, if
- *		  @gfp is GFP_KERNEL.
+ * Asynchronous variant of request_firmware() for user contexts:
+ * 	- sleep for as small periods as possible since it may
+ * 	  increase kernel boot time of built-in device drivers
+ * 	  requesting firmware in their ->probe() methods, if
+ * 	  @gfp is GFP_KERNEL.
  *
- *		- can't sleep at all if @gfp is GFP_ATOMIC.
+ * 	- can't sleep at all if @gfp is GFP_ATOMIC.
  **/
 int
 request_firmware_nowait(
@@ -1206,7 +1206,6 @@ static struct fw_priv *lookup_fw_priv(const char *fw_name)
  *
  * Return 0 if the firmware cache has been removed successfully
  * Return !0 otherwise
- *
  */
 static int uncache_firmware(const char *fw_name)
 {
