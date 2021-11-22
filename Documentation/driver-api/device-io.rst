@@ -489,7 +489,7 @@ pci_ioremap_bar(), pci_ioremap_wc_bar()
 
 pci_iomap(), pci_iomap_wc()
 
-  Like pci_ioremap_bar()/pci_ioremap_bar(), but also works on I/O space when
+  Like pci_ioremap_bar()/pci_ioremap_wc_bar(), but also works on I/O space when
   used together with ioread32()/iowrite32() and similar accessors
 
 pcim_iomap()
