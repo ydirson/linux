@@ -2288,6 +2288,8 @@ static int amdgpu_device_ip_init(struct amdgpu_device *adev)
 	for (i = 0; i < adev->num_ip_blocks; i++) {
 		if (!adev->ip_blocks[i].status.valid)
 			continue;
+		DRM_INFO("sw_init of IP block <%s>...\n",
+			 adev->ip_blocks[i].version->funcs->name);
 		r = adev->ip_blocks[i].version->funcs->sw_init((void *)adev);
 		if (r) {
 			DRM_ERROR("sw_init of IP block <%s> failed %d\n",
@@ -2733,6 +2735,8 @@ static int amdgpu_device_ip_fini(struct amdgpu_device *adev)
 			amdgpu_ib_pool_fini(adev);
 		}
 
+		DRM_INFO("sw_fini of IP block <%s>...\n",
+			 adev->ip_blocks[i].version->funcs->name);
 		r = adev->ip_blocks[i].version->funcs->sw_fini((void *)adev);
 		/* XXX handle errors */
 		if (r) {
