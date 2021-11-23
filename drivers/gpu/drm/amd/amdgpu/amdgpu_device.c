@@ -2183,6 +2183,8 @@ static int amdgpu_device_ip_early_init(struct amdgpu_device *adev)
 			adev->ip_blocks[i].status.valid = false;
 		} else {
 			if (adev->ip_blocks[i].version->funcs->early_init) {
+				DRM_INFO("early_init of IP block <%s>...\n",
+					 adev->ip_blocks[i].version->funcs->name);
 				r = adev->ip_blocks[i].version->funcs->early_init((void *)adev);
 				if (r == -ENOENT) {
 					adev->ip_blocks[i].status.valid = false;
@@ -2239,6 +2241,8 @@ static int amdgpu_device_ip_hw_init_phase1(struct amdgpu_device *adev)
 		if (adev->ip_blocks[i].version->type == AMD_IP_BLOCK_TYPE_COMMON ||
 		    (amdgpu_sriov_vf(adev) && (adev->ip_blocks[i].version->type == AMD_IP_BLOCK_TYPE_PSP)) ||
 		    adev->ip_blocks[i].version->type == AMD_IP_BLOCK_TYPE_IH) {
+			DRM_INFO("hw_init of IP block <%s>...\n",
+				 adev->ip_blocks[i].version->funcs->name);
 			r = adev->ip_blocks[i].version->funcs->hw_init(adev);
 			if (r) {
 				DRM_ERROR("hw_init of IP block <%s> failed %d\n",
@@ -2340,6 +2344,8 @@ static int amdgpu_device_ip_init(struct amdgpu_device *adev)
 	for (i = 0; i < adev->num_ip_blocks; i++) {
 		if (!adev->ip_blocks[i].status.valid)
 			continue;
+		DRM_INFO("sw_init of IP block <%s>...\n",
+			 adev->ip_blocks[i].version->funcs->name);
 		r = adev->ip_blocks[i].version->funcs->sw_init((void *)adev);
 		if (r) {
 			DRM_ERROR("sw_init of IP block <%s> failed %d\n",
@@ -2355,6 +2361,8 @@ static int amdgpu_device_ip_init(struct amdgpu_device *adev)
 				DRM_ERROR("amdgpu_vram_scratch_init failed %d\n", r);
 				goto init_failed;
 			}
+			DRM_INFO("hw_init of IP block <%s>...\n",
+				 adev->ip_blocks[i].version->funcs->name);
 			r = adev->ip_blocks[i].version->funcs->hw_init((void *)adev);
 			if (r) {
 				DRM_ERROR("hw_init %d failed %d\n", i, r);
@@ -2631,6 +2639,8 @@ static int amdgpu_device_ip_late_init(struct amdgpu_device *adev)
 		if (!adev->ip_blocks[i].status.hw)
 			continue;
 		if (adev->ip_blocks[i].version->funcs->late_init) {
+			DRM_INFO("late_init of IP block <%s>...\n",
+				 adev->ip_blocks[i].version->funcs->name);
 			r = adev->ip_blocks[i].version->funcs->late_init((void *)adev);
 			if (r) {
 				DRM_ERROR("late_init of IP block <%s> failed %d\n",
@@ -2703,6 +2713,8 @@ static int amdgpu_device_ip_fini_early(struct amdgpu_device *adev)
 		if (!adev->ip_blocks[i].version->funcs->early_fini)
 			continue;
 
+		DRM_INFO("early_fini of IP block <%s>...\n",
+			 adev->ip_blocks[i].version->funcs->name);
 		r = adev->ip_blocks[i].version->funcs->early_fini((void *)adev);
 		if (r) {
 			DRM_DEBUG("early_fini of IP block <%s> failed %d\n",
@@ -2720,6 +2732,8 @@ static int amdgpu_device_ip_fini_early(struct amdgpu_device *adev)
 		if (!adev->ip_blocks[i].status.hw)
 			continue;
 		if (adev->ip_blocks[i].version->type == AMD_IP_BLOCK_TYPE_SMC) {
+			DRM_INFO("hw_fini of IP block <%s>...\n",
+				 adev->ip_blocks[i].version->funcs->name);
 			r = adev->ip_blocks[i].version->funcs->hw_fini((void *)adev);
 			/* XXX handle errors */
 			if (r) {
@@ -2735,6 +2749,8 @@ static int amdgpu_device_ip_fini_early(struct amdgpu_device *adev)
 		if (!adev->ip_blocks[i].status.hw)
 			continue;
 
+		DRM_INFO("hw_fini of IP block <%s>...\n",
+			 adev->ip_blocks[i].version->funcs->name);
 		r = adev->ip_blocks[i].version->funcs->hw_fini((void *)adev);
 		/* XXX handle errors */
 		if (r) {
@@ -2790,6 +2806,8 @@ static int amdgpu_device_ip_fini(struct amdgpu_device *adev)
 			amdgpu_ib_pool_fini(adev);
 		}
 
+		DRM_INFO("sw_fini of IP block <%s>...\n",
+			 adev->ip_blocks[i].version->funcs->name);
 		r = adev->ip_blocks[i].version->funcs->sw_fini((void *)adev);
 		/* XXX handle errors */
 		if (r) {
@@ -2803,8 +2821,11 @@ static int amdgpu_device_ip_fini(struct amdgpu_device *adev)
 	for (i = adev->num_ip_blocks - 1; i >= 0; i--) {
 		if (!adev->ip_blocks[i].status.late_initialized)
 			continue;
-		if (adev->ip_blocks[i].version->funcs->late_fini)
+		if (adev->ip_blocks[i].version->funcs->late_fini) {
+			DRM_INFO("late_fini of IP block <%s>...\n",
+				 adev->ip_blocks[i].version->funcs->name);
 			adev->ip_blocks[i].version->funcs->late_fini((void *)adev);
+		}
 		adev->ip_blocks[i].status.late_initialized = false;
 	}
 
