@@ -534,12 +534,19 @@ int amdgpu_gfx_enable_kcq(struct amdgpu_device *adev)
 		spin_unlock(&adev->gfx.kiq.ring_lock);
 		return r;
 	}
+	DRM_DEBUG("kiq alloc'd %d\n", kiq->pmf->map_queues_size *
+				      adev->gfx.num_compute_rings +
+				      kiq->pmf->set_resources_size);
+	DRM_DEBUG("kiq size init: %d\n", kiq_ring->count_dw);
 
 	kiq->pmf->kiq_set_resources(kiq_ring, queue_mask);
+	DRM_DEBUG("kiq size after set_res: %d\n", kiq_ring->count_dw);
 	for (i = 0; i < adev->gfx.num_compute_rings; i++)
 		kiq->pmf->kiq_map_queues(kiq_ring, &adev->gfx.compute_ring[i]);
+	DRM_DEBUG("kiq size after map_q: %d\n", kiq_ring->count_dw);
 
 	r = amdgpu_ring_test_helper(kiq_ring);
+	DRM_DEBUG("kiq size after test: %d\n", kiq_ring->count_dw);
 	spin_unlock(&adev->gfx.kiq.ring_lock);
 	if (r)
 		DRM_ERROR("KCQ enable failed\n");

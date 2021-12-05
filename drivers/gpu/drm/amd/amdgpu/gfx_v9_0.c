@@ -1943,6 +1943,7 @@ static int gfx_v9_0_rlc_init(struct amdgpu_device *adev)
 {
 	const struct cs_section_def *cs_data;
 	int r;
+	DRM_DEBUG("gfx_v9_0_rlc_init\n");
 
 	adev->gfx.rlc.cs_data = gfx9_cs_data;
 

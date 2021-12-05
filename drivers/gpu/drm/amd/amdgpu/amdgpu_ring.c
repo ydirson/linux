@@ -70,6 +70,9 @@ int amdgpu_ring_alloc(struct amdgpu_ring *ring, unsigned ndw)
 	if (WARN_ON_ONCE(ndw > ring->max_dw))
 		return -ENOMEM;
 
+	/* check we're not allocating too fast */
+	WARN_ON_ONCE(ring->count_dw);
+
 	ring->count_dw = ndw;
 	ring->wptr_old = ring->wptr;
 
