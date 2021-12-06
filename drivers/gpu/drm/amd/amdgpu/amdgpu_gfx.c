@@ -545,6 +545,7 @@ int amdgpu_gfx_enable_kcq(struct amdgpu_device *adev)
 		kiq->pmf->kiq_map_queues(kiq_ring, &adev->gfx.compute_ring[i]);
 	DRM_DEBUG("kiq size after map_q: %d\n", kiq_ring->count_dw);
 
+	amdgpu_ring_commit(kiq_ring);
 	r = amdgpu_ring_test_helper(kiq_ring);
 	DRM_DEBUG("kiq size after test: %d\n", kiq_ring->count_dw);
 	spin_unlock(&adev->gfx.kiq.ring_lock);
