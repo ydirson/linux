@@ -754,6 +754,7 @@ int amdgpu_ucode_init_bo(struct amdgpu_device *adev)
 	for (i = 0; i < adev->firmware.max_ucodes; i++) {
 		ucode = &adev->firmware.ucode[i];
 		if (ucode->fw) {
+			DRM_DEBUG("init ucode[%d]->fw, type=%d\n", i, adev->firmware.load_type);
 			amdgpu_ucode_init_single_fw(adev, ucode, adev->firmware.fw_buf_mc + fw_offset,
 						    adev->firmware.fw_buf_ptr + fw_offset);
 			if (i == AMDGPU_UCODE_ID_CP_MEC1 &&
