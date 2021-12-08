@@ -2193,6 +2193,9 @@ static int psp_hw_start(struct psp_context *psp)
 			}
 		}
 
+		DRM_DEBUG("sos_fw valid? %d, bootloader_load_sos=%p\n",
+			  is_psp_fw_valid(psp->sos),
+			  psp->funcs->bootloader_load_sos);
 		if ((is_psp_fw_valid(psp->sos)) &&
 		    (psp->funcs->bootloader_load_sos != NULL)) {
 			ret = psp_bootloader_load_sos(psp);
