@@ -2241,8 +2241,8 @@ static int amdgpu_device_ip_hw_init_phase1(struct amdgpu_device *adev)
 		if (adev->ip_blocks[i].version->type == AMD_IP_BLOCK_TYPE_COMMON ||
 		    (amdgpu_sriov_vf(adev) && (adev->ip_blocks[i].version->type == AMD_IP_BLOCK_TYPE_PSP)) ||
 		    adev->ip_blocks[i].version->type == AMD_IP_BLOCK_TYPE_IH) {
-			DRM_INFO("hw_init (phase1) of IP block <%s>...\n",
-				 adev->ip_blocks[i].version->funcs->name);
+			DRM_DEBUG("hw_init (phase1) of IP block <%s>...\n",
+				  adev->ip_blocks[i].version->funcs->name);
 			r = adev->ip_blocks[i].version->funcs->hw_init(adev);
 			if (r) {
 				DRM_ERROR("hw_init of IP block <%s> failed %d\n",
@@ -2265,8 +2265,8 @@ static int amdgpu_device_ip_hw_init_phase2(struct amdgpu_device *adev)
 			continue;
 		if (adev->ip_blocks[i].status.hw)
 			continue;
-		DRM_INFO("hw_init (phase2) of IP block <%s>...\n",
-			 adev->ip_blocks[i].version->funcs->name);
+		DRM_DEBUG("hw_init (phase2) of IP block <%s>...\n",
+			  adev->ip_blocks[i].version->funcs->name);
 		r = adev->ip_blocks[i].version->funcs->hw_init(adev);
 		if (r) {
 			DRM_ERROR("hw_init of IP block <%s> failed %d\n",
@@ -2305,8 +2305,8 @@ static int amdgpu_device_fw_loading(struct amdgpu_device *adev)
 					return r;
 				}
 			} else {
-				DRM_INFO("hw_init (fw_loading) of IP block <%s>...\n",
-					 adev->ip_blocks[i].version->funcs->name);
+				DRM_DEBUG("hw_init (fw_loading) of IP block <%s>...\n",
+					  adev->ip_blocks[i].version->funcs->name);
 				r = adev->ip_blocks[i].version->funcs->hw_init(adev);
 				if (r) {
 					DRM_ERROR("hw_init of IP block <%s> failed %d\n",
@@ -2348,8 +2348,8 @@ static int amdgpu_device_ip_init(struct amdgpu_device *adev)
 	for (i = 0; i < adev->num_ip_blocks; i++) {
 		if (!adev->ip_blocks[i].status.valid)
 			continue;
-		DRM_INFO("sw_init of IP block <%s>...\n",
-			 adev->ip_blocks[i].version->funcs->name);
+		DRM_DEBUG("sw_init of IP block <%s>...\n",
+			  adev->ip_blocks[i].version->funcs->name);
 		r = adev->ip_blocks[i].version->funcs->sw_init((void *)adev);
 		if (r) {
 			DRM_ERROR("sw_init of IP block <%s> failed %d\n",
@@ -2365,8 +2365,8 @@ static int amdgpu_device_ip_init(struct amdgpu_device *adev)
 				DRM_ERROR("amdgpu_vram_scratch_init failed %d\n", r);
 				goto init_failed;
 			}
-			DRM_INFO("hw_init (ip_init) of IP block <%s>...\n",
-				 adev->ip_blocks[i].version->funcs->name);
+			DRM_DEBUG("hw_init (ip_init) of IP block <%s>...\n",
+				  adev->ip_blocks[i].version->funcs->name);
 			r = adev->ip_blocks[i].version->funcs->hw_init((void *)adev);
 			if (r) {
 				DRM_ERROR("hw_init %d failed %d\n", i, r);
