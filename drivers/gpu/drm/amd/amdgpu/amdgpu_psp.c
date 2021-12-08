@@ -795,6 +795,7 @@ static int psp_asd_load(struct psp_context *psp)
 {
 	int ret;
 	struct psp_gfx_cmd_resp *cmd;
+	DRM_DEBUG("\n");
 
 	/* If PSP version doesn't match ASD version, asd loading will be failed.
 	 * add workaround to bypass it for sriov now.
@@ -2135,6 +2136,7 @@ static int psp_hw_start(struct psp_context *psp)
 {
 	struct amdgpu_device *adev = psp->adev;
 	int ret;
+	DRM_DEBUG("\n");
 
 	if (!amdgpu_sriov_vf(adev)) {
 		if ((is_psp_fw_valid(psp->kdb)) &&
@@ -2518,6 +2520,7 @@ static int psp_load_non_psp_fw(struct psp_context *psp)
 	int i, ret;
 	struct amdgpu_firmware_info *ucode;
 	struct amdgpu_device *adev = psp->adev;
+	DRM_DEBUG("\n");
 
 	if (psp->autoload_supported &&
 	    !psp->pmfw_centralized_cstate_management) {
@@ -2574,6 +2577,7 @@ static int psp_load_fw(struct amdgpu_device *adev)
 {
 	int ret;
 	struct psp_context *psp = &adev->psp;
+	DRM_DEBUG("\n");
 
 	if (amdgpu_sriov_vf(adev) && amdgpu_in_reset(adev)) {
 		psp_ring_stop(psp, PSP_RING_TYPE__KM); /* should not destroy ring, only stop */
@@ -3178,6 +3182,7 @@ int psp_init_sos_microcode(struct psp_context *psp,
 	int err = 0;
 	uint8_t *ucode_array_start_addr;
 	int fw_index = 0;
+	DRM_DEBUG("\n");
 
 	if (!chip_name) {
 		dev_err(adev->dev, "invalid chip name for sos microcode\n");

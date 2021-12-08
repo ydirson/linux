@@ -123,6 +123,7 @@ static int psp_v12_0_bootloader_load_sysdrv(struct psp_context *psp)
 	uint32_t psp_gfxdrv_command_reg = 0;
 	struct amdgpu_device *adev = psp->adev;
 	uint32_t sol_reg;
+	DRM_DEBUG("\n");
 
 	/* Check sOS sign of life register to confirm sys driver and sOS
 	 * are already been loaded.
@@ -162,6 +163,7 @@ static int psp_v12_0_bootloader_load_sos(struct psp_context *psp)
 	unsigned int psp_gfxdrv_command_reg = 0;
 	struct amdgpu_device *adev = psp->adev;
 	uint32_t sol_reg;
+	DRM_DEBUG("\n");
 
 	/* Check sOS sign of life register to confirm sys driver and sOS
 	 * are already been loaded.
