@@ -840,7 +840,8 @@ _request_firmware(const struct firmware **firmware_p, const char *name,
 		fw_abort_batch_reqs(fw);
 		release_firmware(fw);
 		fw = NULL;
-	}
+	} else
+		dev_info(device, "Firmware %s loaded\n", name);
 
 	*firmware_p = fw;
 	return ret;
