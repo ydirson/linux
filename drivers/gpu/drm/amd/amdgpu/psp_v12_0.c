@@ -265,6 +265,7 @@ static int psp_v12_0_ring_create(struct psp_context *psp,
 	struct amdgpu_device *adev = psp->adev;
 
 	if (amdgpu_sriov_vf(psp->adev)) {
+		DRM_DEBUG("sriov_vf\n");
 		/* Write low address of the ring to C2PMSG_102 */
 		psp_ring_reg = lower_32_bits(ring->ring_mem_mc_addr);
 		WREG32_SOC15(MP0, 0, mmMP0_SMN_C2PMSG_102, psp_ring_reg);
@@ -284,6 +285,7 @@ static int psp_v12_0_ring_create(struct psp_context *psp,
 				   0x80000000, 0x8000FFFF, false);
 
 	} else {
+		DRM_DEBUG("not sriov_vf\n");
 		/* Write low address of the ring to C2PMSG_69 */
 		psp_ring_reg = lower_32_bits(ring->ring_mem_mc_addr);
 		WREG32_SOC15(MP0, 0, mmMP0_SMN_C2PMSG_69, psp_ring_reg);

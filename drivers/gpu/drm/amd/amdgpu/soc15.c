@@ -1435,6 +1435,7 @@ static void soc15_doorbell_range_init(struct amdgpu_device *adev)
 static int soc15_common_hw_init(void *handle)
 {
 	struct amdgpu_device *adev = (struct amdgpu_device *)handle;
+	DRM_DEBUG("\n");
 
 	/* enable pcie gen2/3 link */
 	soc15_pcie_gen3_enable(adev);
