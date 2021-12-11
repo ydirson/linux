@@ -2139,6 +2139,7 @@ static int psp_hw_start(struct psp_context *psp)
 	DRM_DEBUG("\n");
 
 	if (!amdgpu_sriov_vf(adev)) {
+		DRM_DEBUG("bootloader_load_*\n");
 		if ((is_psp_fw_valid(psp->kdb)) &&
 		    (psp->funcs->bootloader_load_kdb != NULL)) {
 			ret = psp_bootloader_load_kdb(psp);
@@ -2157,6 +2158,9 @@ static int psp_hw_start(struct psp_context *psp)
 			}
 		}
 
+		DRM_DEBUG("sysdrv_fw valid? %d, bootloader_load_sysdrv=%p\n",
+			  is_psp_fw_valid(psp->sys),
+			  psp->funcs->bootloader_load_sysdrv);
 		if ((is_psp_fw_valid(psp->sys)) &&
 		    (psp->funcs->bootloader_load_sysdrv != NULL)) {
 			ret = psp_bootloader_load_sysdrv(psp);
