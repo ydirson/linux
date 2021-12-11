@@ -2209,6 +2209,7 @@ static int psp_hw_start(struct psp_context *psp)
 			}
 		}
 	}
+	else DRM_DEBUG("amdgpu_sriov_vf!\n");
 
 	ret = psp_ring_create(psp, PSP_RING_TYPE__KM);
 	if (ret) {
