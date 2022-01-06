@@ -1327,12 +1327,16 @@ static void gmc_v9_0_vram_gtt_location(struct amdgpu_device *adev,
 		amdgpu_gmc_gart_location(adev, mc);
 		amdgpu_gmc_agp_location(adev, mc);
 	}
+#if 0
 	/* base offset of vram pages */
 	adev->vm_manager.vram_base_offset = adev->gfxhub.funcs->get_mc_fb_offset(adev);
 
 	/* XXX: add the xgmi offset of the physical node? */
 	adev->vm_manager.vram_base_offset +=
 		adev->gmc.xgmi.physical_node_id * adev->gmc.xgmi.node_segment_size;
+#else
+	adev->vm_manager.vram_base_offset = pci_resource_start(adev->pdev, 0);
+#endif
 }
 
 /**
