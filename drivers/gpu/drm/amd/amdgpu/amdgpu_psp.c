@@ -2717,7 +2717,7 @@ static int psp_hw_init(void *handle)
 failed:
 	adev->firmware.load_type = AMDGPU_FW_LOAD_DIRECT;
 	mutex_unlock(&adev->firmware.mutex);
-	return -EINVAL;
+	return ret;
 }
 
 static int psp_hw_fini(void *handle)
