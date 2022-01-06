@@ -727,7 +727,7 @@ void amdgpu_gmc_get_vbios_allocations(struct amdgpu_device *adev)
  * @adev: amdgpu_device pointer
  *
  * This function is only used when GART page table is used
- * for FB address translatioin. In such a case, we construct
+ * for FB address translation. In such a case, we construct
  * a 2-level system VM page table: PDB0->PTB, to cover both
  * VRAM of the hive and system memory.
  *
