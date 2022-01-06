@@ -1362,7 +1362,7 @@ static int gmc_v9_0_mc_init(struct amdgpu_device *adev)
 	adev->gmc.aper_base = pci_resource_start(adev->pdev, 0);
 	adev->gmc.aper_size = pci_resource_len(adev->pdev, 0);
 
-#ifdef CONFIG_X86_64
+#if 0 // def CONFIG_X86_64
 	/*
 	 * AMD Accelerated Processing Platform (APP) supporting GPU-HOST xgmi
 	 * interface can use VRAM through here as it appears system reserved
